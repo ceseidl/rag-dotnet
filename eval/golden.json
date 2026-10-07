@@ -1,0 +1,18 @@
+[
+  { "question": "Posso fazer deploy na sexta-feira?", "expectedDocuments": ["politica-de-deploy"] },
+  { "question": "Qual é a janela de horário para deploy em produção?", "expectedDocuments": ["politica-de-deploy"] },
+  { "question": "Quem aprova um hotfix fora da janela de deploy?", "expectedDocuments": ["politica-de-deploy"] },
+  { "question": "Como faço rollback de uma versão com erro em produção?", "expectedDocuments": ["runbook-rollback"] },
+  { "question": "Posso reverter uma migration que apagou dados?", "expectedDocuments": ["runbook-rollback"] },
+  { "question": "Por que escolhemos RabbitMQ em vez de Kafka?", "expectedDocuments": ["adr-0007-mensageria"] },
+  { "question": "O que é o outbox e por que usamos?", "expectedDocuments": ["adr-0007-mensageria"] },
+  { "question": "Como rodo o sistema na minha máquina?", "expectedDocuments": ["faq-onboarding"] },
+  { "question": "Que horas é a daily do time?", "expectedDocuments": ["faq-onboarding"] },
+  { "question": "Qual a cobertura mínima de testes na camada Application?", "expectedDocuments": ["padroes-de-codigo"] },
+  { "question": "Posso colocar o CPF do cliente no log?", "expectedDocuments": ["politica-de-dados"] },
+  { "question": "Quanto tempo os logs de auditoria ficam armazenados?", "expectedDocuments": ["politica-de-dados"] },
+  { "question": "Como uso o acesso break-glass ao banco de produção?", "expectedDocuments": ["runbook-incidente-sev1"], "access": "Restricted" },
+  { "question": "Quantos dias de férias eu tenho por ano?", "expectedDocuments": [], "shouldAbstain": true },
+  { "question": "Qual é o valor do vale-refeição?", "expectedDocuments": [], "shouldAbstain": true },
+  { "question": "Como uso o acesso break-glass ao banco de produção?", "expectedDocuments": [], "shouldAbstain": true, "access": "Team" }
+]
