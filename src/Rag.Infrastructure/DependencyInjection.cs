@@ -40,10 +40,11 @@ public static class DependencyInjection
             ai.EmbeddingDimensions));
 
         // IA: provedor real. Os fakes só entram com Mode=Offline
-        // pedido de forma explícita (--offline); nunca por omissão.
+        // pedido de forma explícita (--offline).
         s.AddDistributedMemoryCache();
         if (ai.Mode == "Offline") AddOffline(s, ai);
-        else if (ai.Mode == "OpenAiCompatible") AddProvider(s, ai);
+        else if (ai.Mode == "OpenAiCompatible")
+            AddProvider(s, ai);
         else throw new InvalidOperationException(NoProvider);
 
         // Casos de uso.
@@ -57,10 +58,10 @@ public static class DependencyInjection
 
     public const string NoProvider =
         "Nenhum provedor de IA configurado. Use Profile=Ollama " +
-        "(suba o Ollama: docker start ollama) ou Profile=Foundry " +
-        "(dotnet user-secrets set \"Ai:ApiKey\" \"<sua-chave>\" e " +
-        "Ai:Endpoint). Para a demonstração mecânica com fakes, " +
-        "use --offline.";
+        "(suba o Ollama: docker start ollama) ou " +
+        "Profile=Foundry (dotnet user-secrets set " +
+        "\"Ai:ApiKey\" \"<sua-chave>\" e Ai:Endpoint). Para a " +
+        "demonstração mecânica com fakes, use --offline.";
 
     private static void AddOffline(
         IServiceCollection s, AiOptions ai)

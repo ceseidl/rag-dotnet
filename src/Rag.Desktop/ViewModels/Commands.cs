@@ -18,7 +18,7 @@ public abstract class Observable : INotifyPropertyChanged
     }
 }
 
-/// <summary>Comando assíncrono simples: desabilita enquanto roda.</summary>
+/// <summary>Comando assíncrono; desabilita ao rodar.</summary>
 public sealed class AsyncCommand(
     Func<Task> run, Func<bool>? canRun = null) : ICommand
 {

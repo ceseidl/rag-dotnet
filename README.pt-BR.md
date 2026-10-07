@@ -31,7 +31,7 @@ dotnet build
 dotnet test
 ```
 
-Esperado: 34 aprovados. Os testes usam fakes determinísticos atrás das
+Esperado: 40 aprovados. Os testes usam fakes determinísticos atrás das
 mesmas interfaces; validam a **mecânica** (chunking, reindexação,
 limiar, filtro de acesso, proteção contra injeção, citações,
 retentativas), não a qualidade semântica de um modelo.
@@ -104,11 +104,31 @@ ouro, crie `eval/meu-golden.json` (ignorado pelo git) e use
 HTML não são lidos: escreva outra `IDocumentSource`. Não indexe
 segredos nem dados pessoais crus.
 
-## API (modo offline por padrão)
+## Aplicativo Windows (WPF)
+
+```bash
+docker start ollama            # ou: Profile Foundry + chave nos user-secrets
+dotnet run --project src/Rag.Desktop
+```
+
+Escolha o provedor (Ollama ou Foundry), o nível de acesso e a pasta de
+documentos, pergunte e veja a resposta, as fontes citadas com a nota de
+similaridade e métricas reais (tempo por etapa, trechos, tokens). Ele
+chama o pipeline real; os erros (401, 404, 429 com `Retry-After`, sem
+conexão) aparecem em linguagem clara. A chave só vem de user-secrets ou
+de variável de ambiente.
+
+**Nada chumbado:** os fakes existem só nos testes automatizados e no
+modo `--offline` explícito (demonstração da mecânica). Sem provedor, o
+app e a API param com uma mensagem que diz o que configurar; nunca
+caem num fake em silêncio.
+
+## API (precisa de provedor; `--offline` para a demonstração mecânica)
 
 ```bash
 cd src/Rag.Api
-ASPNETCORE_ENVIRONMENT=Development dotnet run
+Profile=Ollama ASPNETCORE_ENVIRONMENT=Development dotnet run
+# (ou acrescente --offline para a demonstração com fakes)
 curl -X POST http://localhost:5025/api/v1/ask \
   -H "Content-Type: application/json" \
   -H "X-Dev-User: ana" -H "X-Dev-Level: Team" \
@@ -137,6 +157,7 @@ src/
                        resiliência, fakes offline, DI
   Rag.SemanticKernel/  busca como plugin do Semantic Kernel / AIFunction
   Rag.Api/             Minimal API, comandos --ask e --eval
+  Rag.Desktop/         app WPF (net10.0-windows), MVVM, pipeline real
 tests/Rag.Tests/       xUnit, sem rede
 docs-exemplo/          documentos de exemplo fictícios
 docs-meus/             os seus documentos (ignorada pelo git)

@@ -4,9 +4,9 @@ using Rag.Infrastructure;
 
 namespace Rag.Desktop.Services;
 
-/// <summary>Monta o provedor de serviços do pipeline para um perfil
-/// (Ollama ou Foundry) e uma pasta de documentos. A chave só vem de
-/// user-secrets ou de variável de ambiente.</summary>
+/// <summary>Monta os serviços do pipeline para um perfil
+/// (Ollama ou Foundry) e uma pasta de documentos. A chave só
+/// vem de user-secrets ou de variável de ambiente.</summary>
 public static class RagHost
 {
     public static IServiceProvider Build(

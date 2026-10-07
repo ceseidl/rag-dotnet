@@ -40,16 +40,16 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" Height="64" TextWrapping="Wrap"
-                     AcceptsReturn="True" Padding="6"
-                     AutomationProperties.AutomationId="Question"
-                     Text="{Binding Question,
-                            UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Height="64" TextWrapping="Wrap"
+                AcceptsReturn="True" Padding="6"
+                AutomationProperties.AutomationId="Question"
+                Text="{Binding Question,
+                    UpdateSourceTrigger=PropertyChanged}" />
             <StackPanel Grid.Column="1" Margin="12,0,0,0">
-                <Button Content="Perguntar" Width="110" Height="30"
-                        FontWeight="SemiBold"
-                        AutomationProperties.AutomationId="Ask"
-                        Command="{Binding Ask}" />
+                <Button Content="Perguntar" Width="110"
+                    Height="30" FontWeight="SemiBold"
+                    AutomationProperties.AutomationId="Ask"
+                    Command="{Binding Ask}" />
                 <Button Content="Cancelar" Width="110" Height="26"
                         Margin="0,8,0,0"
                         Command="{Binding Cancel}" />
@@ -107,10 +107,10 @@
                                 <GridViewColumn Header="[n]" Width="40"
                                     DisplayMemberBinding="{Binding Number}" />
                                 <GridViewColumn Header="Documento"
-                                    Width="210"
+                                    Width="190"
                                     DisplayMemberBinding="{Binding Title}" />
                                 <GridViewColumn Header="Trecho"
-                                    Width="260"
+                                    Width="330"
                                     DisplayMemberBinding="{Binding Where}" />
                                 <GridViewColumn Header="Nota" Width="60"
                                     DisplayMemberBinding="{Binding Score}" />

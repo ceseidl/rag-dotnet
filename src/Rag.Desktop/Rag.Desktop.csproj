@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <!-- mesmos user-secrets da Rag.Api: a chave fica num só lugar -->
+    <!-- os mesmos user-secrets da Rag.Api -->
     <UserSecretsId>004f6af5-c207-4b9f-80d6-f53e32dac974</UserSecretsId>
   </PropertyGroup>
 

@@ -5,7 +5,7 @@ public sealed class AiOptions
     public const string Section = "Ai";
 
     /// <summary>OpenAiCompatible (provedor real) ou Offline
-    /// (fakes, só com --offline). Vazio: erro com instruções.</summary>
+    /// (fakes, só com --offline). Vazio: erro.</summary>
     public string Mode { get; set; } = "";
 
     /// <summary>Base URL do endpoint (API OpenAI).</summary>

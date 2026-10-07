@@ -18,7 +18,8 @@ public sealed record MetricItem(string Name, string Value);
 /// perfil e a pasta e devolve o provedor de serviços.</summary>
 public sealed class MainViewModel : Observable
 {
-    private readonly Func<string, string, IServiceProvider> _build;
+    private readonly
+        Func<string, string, IServiceProvider> _build;
     private IServiceProvider? _sp;
     private string _key = "";
     private bool _indexed;
@@ -169,7 +170,8 @@ public sealed class MainViewModel : Observable
     }
 
     private void Show(
-        AskResult r, double secs, List<(string Name, double Ms)> st)
+        AskResult r, double secs,
+        List<(string Name, double Ms)> st)
     {
         Answer = r.Answer;
         Answered = r.Answered;
@@ -180,7 +182,8 @@ public sealed class MainViewModel : Observable
 
         foreach (var name in new[] { "embed-query", "retrieve",
                      "generate" })
-            foreach (var s in st.Where(x => x.Name == "rag." + name))
+            foreach (var s in st.Where(
+                         x => x.Name == "rag." + name))
                 Metrics.Add(new(name, $"{s.Ms:0} ms"));
         var d = r.Diagnostics;
         Metrics.Add(new("trechos candidatos", $"{d.Candidates}"));
