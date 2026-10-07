@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/Rag.Api/Rag.Api.csproj" />
     <Project Path="src/Rag.Application/Rag.Application.csproj" />
+    <Project Path="src/Rag.Desktop/Rag.Desktop.csproj" />
     <Project Path="src/Rag.Domain/Rag.Domain.csproj" />
     <Project Path="src/Rag.Infrastructure/Rag.Infrastructure.csproj" />
     <Project Path="src/Rag.SemanticKernel/Rag.SemanticKernel.csproj" />

@@ -1,0 +1,146 @@
+<Window x:Class="Rag.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="RAG em .NET" Width="1100" Height="760"
+        MinWidth="900" MinHeight="600"
+        FontFamily="Segoe UI" FontSize="14">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- provedor, acesso e documentos -->
+        <WrapPanel Grid.Row="0" Margin="0,0,0,12">
+            <TextBlock Text="Provedor" VerticalAlignment="Center" />
+            <ComboBox Width="120" Margin="8,0,20,0"
+                      AutomationProperties.AutomationId="Profile"
+                      ItemsSource="{Binding Profiles}"
+                      SelectedItem="{Binding Profile}" />
+            <TextBlock Text="Acesso" VerticalAlignment="Center" />
+            <ComboBox Width="110" Margin="8,0,20,0"
+                      AutomationProperties.AutomationId="Access"
+                      ItemsSource="{Binding Levels}"
+                      SelectedItem="{Binding Access}" />
+            <TextBlock Text="Documentos" VerticalAlignment="Center" />
+            <TextBox Width="220" Margin="8,0,8,0" IsReadOnly="True"
+                     Text="{Binding Folder, Mode=OneWay}" />
+            <Button Content="Escolher pasta..." Padding="10,3"
+                    Click="PickFolder" />
+            <Button Content="Reindexar" Padding="10,3" Margin="8,0,0,0"
+                    AutomationProperties.AutomationId="Reindex"
+                    Command="{Binding Reindex}" />
+        </WrapPanel>
+
+        <!-- pergunta -->
+        <Grid Grid.Row="1" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Height="64" TextWrapping="Wrap"
+                     AcceptsReturn="True" Padding="6"
+                     AutomationProperties.AutomationId="Question"
+                     Text="{Binding Question,
+                            UpdateSourceTrigger=PropertyChanged}" />
+            <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                <Button Content="Perguntar" Width="110" Height="30"
+                        FontWeight="SemiBold"
+                        AutomationProperties.AutomationId="Ask"
+                        Command="{Binding Ask}" />
+                <Button Content="Cancelar" Width="110" Height="26"
+                        Margin="0,8,0,0"
+                        Command="{Binding Cancel}" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <ProgressBar Grid.ColumnSpan="2" Height="6" Margin="0,0,0,8"
+                         IsIndeterminate="True"
+                         Visibility="{Binding IsBusy,
+                             Converter={StaticResource BoolToVis}}" />
+
+            <Grid Grid.Row="1" Grid.Column="0" Margin="0,0,12,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="1.2*" />
+                </Grid.RowDefinitions>
+                <GroupBox Header="Resposta">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <TextBlock TextWrapping="Wrap" Padding="8"
+                                   FontSize="16"
+                                   AutomationProperties.AutomationId="Answer"
+                                   Text="{Binding Answer}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground"
+                                            Value="Black" />
+                                    <Style.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding Answered}"
+                                            Value="False">
+                                            <Setter Property="Foreground"
+                                                    Value="#64748b" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </ScrollViewer>
+                </GroupBox>
+                <GroupBox Grid.Row="1" Header="Fontes citadas"
+                          Margin="0,8,0,0">
+                    <ListView ItemsSource="{Binding Sources}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="[n]" Width="40"
+                                    DisplayMemberBinding="{Binding Number}" />
+                                <GridViewColumn Header="Documento"
+                                    Width="210"
+                                    DisplayMemberBinding="{Binding Title}" />
+                                <GridViewColumn Header="Trecho"
+                                    Width="260"
+                                    DisplayMemberBinding="{Binding Where}" />
+                                <GridViewColumn Header="Nota" Width="60"
+                                    DisplayMemberBinding="{Binding Score}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </GroupBox>
+            </Grid>
+
+            <GroupBox Grid.Row="1" Grid.Column="1" Header="Métricas">
+                <ListView ItemsSource="{Binding Metrics}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Etapa" Width="150"
+                                DisplayMemberBinding="{Binding Name}" />
+                            <GridViewColumn Header="Valor" Width="110"
+                                DisplayMemberBinding="{Binding Value}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </GroupBox>
+        </Grid>
+
+        <!-- estado e erros -->
+        <StackPanel Grid.Row="3" Margin="0,10,0,0">
+            <TextBlock Text="{Binding Status}" Foreground="#334155"
+                       AutomationProperties.AutomationId="Status" />
+            <TextBlock Text="{Binding Error}" Foreground="#b91c1c"
+                       TextWrapping="Wrap" FontWeight="SemiBold"
+                       AutomationProperties.AutomationId="Error" />
+        </StackPanel>
+    </Grid>
+</Window>

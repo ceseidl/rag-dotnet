@@ -27,4 +27,10 @@
     <ProjectReference Include="..\..\src\Rag.SemanticKernel\Rag.SemanticKernel.csproj" />
   </ItemGroup>
 
+  <!-- o ViewModel do app WPF não depende de WPF: testado aqui -->
+  <ItemGroup>
+    <Compile Include="..\..\src\Rag.Desktop\ViewModels\*.cs"
+             LinkBase="Desktop" />
+  </ItemGroup>
+
 </Project>

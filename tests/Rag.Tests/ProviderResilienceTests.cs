@@ -137,6 +137,18 @@ public class ProviderResilienceTests
     }
 
     [Fact]
+    public void No_provider_configured_is_a_clear_error()
+    {
+        var config = new ConfigurationBuilder().Build();
+
+        var ex = Assert.Throws<InvalidOperationException>(
+            () => new ServiceCollection().AddRag(config));
+
+        Assert.Contains("docker start ollama", ex.Message);
+        Assert.Contains("--offline", ex.Message);
+    }
+
+    [Fact]
     public void Real_mode_requires_endpoint_and_key()
     {
         var config = new ConfigurationBuilder()

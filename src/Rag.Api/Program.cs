@@ -15,7 +15,10 @@ using Rag.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 // Perfil de provedor: Profile=Ollama carrega o arquivo
-// appsettings.Ollama.json (ou Foundry). Sem perfil: Offline.
+// appsettings.Ollama.json (ou Foundry). Sem perfil e sem
+// --offline, o app para com um erro que diz o que configurar.
+if (args.Contains("--offline"))
+    builder.Configuration["Ai:Mode"] = "Offline";
 if (builder.Configuration["Profile"] is { Length: > 0 } profile)
 {
     builder.Configuration.AddJsonFile(
@@ -26,7 +29,12 @@ if (builder.Configuration["Profile"] is { Length: > 0 } profile)
     builder.Configuration.AddCommandLine(args);
 }
 
-builder.Services.AddRag(builder.Configuration);
+try { builder.Services.AddRag(builder.Configuration); }
+catch (InvalidOperationException ex)
+{
+    Console.Error.WriteLine(ex.Message);
+    return 2;
+}
 builder.Services.AddHostedService<IngestOnStartup>();
 
 // Validação (DataAnnotations) nativa do Minimal API,

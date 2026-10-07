@@ -19,7 +19,10 @@ public class ApiTests(WebApplicationFactory<Program> factory)
         Action<IServiceCollection>? services = null)
     {
         var c = factory.WithWebHostBuilder(b =>
-            b.ConfigureTestServices(s => services?.Invoke(s)))
+            {
+                b.UseSetting("Ai:Mode", "Offline");
+                b.ConfigureTestServices(s => services?.Invoke(s));
+            })
             .CreateClient();
         if (user is not null) c.DefaultRequestHeaders.Add("X-Dev-User", user);
         if (level is not null)
