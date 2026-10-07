@@ -33,7 +33,8 @@ public sealed class IngestionService(
             // O hash cobre conteúdo, metadados, chunking e
             // modelo: mudar qualquer um deles reindexa.
             var docHash = Hashing.Sha256(string.Join('|',
-                doc.Title, doc.Version, doc.Access, doc.Content,
+                doc.Title, doc.Version, doc.Access, doc.Area,
+                doc.Content,
                 chunker.Fingerprint, model));
             var current = await store
                 .GetDocumentHashAsync(doc.Id, ct);

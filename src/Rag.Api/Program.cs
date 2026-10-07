@@ -14,6 +14,12 @@ using Rag.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Perfil de provedor: Profile=Ollama carrega o arquivo
+// appsettings.Ollama.json (ou Foundry). Sem perfil: Offline.
+if (builder.Configuration["Profile"] is { Length: > 0 } profile)
+    builder.Configuration.AddJsonFile(
+        $"appsettings.{profile}.json", optional: false);
+
 builder.Services.AddRag(builder.Configuration);
 builder.Services.AddHostedService<IngestOnStartup>();
 
@@ -79,6 +85,8 @@ app.MapRagEndpoints();
 
 if (args.Contains("--eval"))
     return await EvalCommand.RunAsync(app);
+if (args.Contains("--ask"))
+    return await AskCommand.RunAsync(app, args);
 
 app.Run();
 return 0;

@@ -4,16 +4,25 @@ using Rag.Domain;
 
 namespace Rag.Infrastructure.Documents;
 
-/// <summary>Lê .md de uma pasta. Metadados no frontmatter:
-/// title, version e access (public, team, restricted).</summary>
-public sealed class MarkdownFolderSource(string folder)
+/// <summary>Lê arquivos de uma pasta (padrão: .md e .txt). Os
+/// metadados vêm do frontmatter: title, version, area e access
+/// (public, team, restricted). Ignora README.md e arquivos que
+/// começam com "_" ou ".". Para PDF, Word ou HTML, escreva outra
+/// IDocumentSource que extraia o texto.</summary>
+public sealed class FolderDocumentSource(
+    string folder, IReadOnlyList<string>? extensions = null)
     : IDocumentSource
 {
+    private readonly HashSet<string> _ext = new(
+        extensions ?? [".md", ".txt"],
+        StringComparer.OrdinalIgnoreCase);
+
     public async IAsyncEnumerable<SourceDocument> ReadAllAsync(
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         var files = Directory.EnumerateFiles(
-            folder, "*.md", SearchOption.AllDirectories).Order();
+                folder, "*", SearchOption.AllDirectories)
+            .Where(Accepts).Order();
         foreach (var path in files)
         {
             var raw = await File.ReadAllTextAsync(path, ct);
@@ -27,8 +36,18 @@ public sealed class MarkdownFolderSource(string folder)
             yield return new SourceDocument(id,
                 meta.GetValueOrDefault("title") ?? id,
                 meta.GetValueOrDefault("version") ?? "1",
-                acc, rel, body);
+                acc, rel, body,
+                meta.GetValueOrDefault("area") ?? "");
         }
+    }
+
+    private bool Accepts(string path)
+    {
+        var name = Path.GetFileName(path);
+        return _ext.Contains(Path.GetExtension(path))
+            && !name.Equals("README.md",
+                StringComparison.OrdinalIgnoreCase)
+            && !name.StartsWith('_') && !name.StartsWith('.');
     }
 
     public static (Dictionary<string, string>, string) Parse(

@@ -12,7 +12,8 @@ public sealed record Chunk(
     AccessLevel Access,
     string Text,
     string Hash,
-    string DocumentHash)
+    string DocumentHash,
+    string Area = "")
 {
     /// <summary>Texto que vira embedding: título e seção dão
     /// contexto a um trecho que sozinho seria ambíguo.</summary>

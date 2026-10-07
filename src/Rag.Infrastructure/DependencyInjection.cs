@@ -1,5 +1,3 @@
-using System.ClientModel;
-using System.ClientModel.Primitives;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,15 +29,19 @@ public static class DependencyInjection
         s.AddSingleton(ai);
 
         // Dados: documentos e índice (trocável por config).
-        s.AddSingleton<IDocumentSource>(
-            new MarkdownFolderSource(DocsPath(config)));
+        var ext = config.GetSection("Documents:Extensions")
+            .Get<string[]>();
+        s.AddSingleton<IDocumentSource>(new FolderDocumentSource(
+            DocsPath(config), ext));
         s.AddSingleton<VectorStore>(
             _ => VectorStoreFactory.Create(config));
-        s.AddSingleton<IChunkStore, VectorChunkStore>();
+        s.AddSingleton<IChunkStore>(sp => new VectorChunkStore(
+            sp.GetRequiredService<VectorStore>(),
+            ai.EmbeddingDimensions));
 
         // IA: provedor real ou fakes, mesmas interfaces.
         s.AddDistributedMemoryCache();
-        if (ai.Mode == "Offline") AddOffline(s);
+        if (ai.Mode == "Offline") AddOffline(s, ai);
         else AddProvider(s, ai);
 
         // Casos de uso.
@@ -51,9 +53,11 @@ public static class DependencyInjection
         return s;
     }
 
-    private static void AddOffline(IServiceCollection s)
+    private static void AddOffline(
+        IServiceCollection s, AiOptions ai)
     {
-        s.AddEmbeddingGenerator(new HashingEmbeddingGenerator())
+        s.AddEmbeddingGenerator(new HashingEmbeddingGenerator(
+                ai.EmbeddingDimensions))
             .UseDistributedCache()
             .UseOpenTelemetry(sourceName: RagTelemetry.AiName);
         s.AddChatClient(new ExtractiveChatClient())
@@ -63,8 +67,9 @@ public static class DependencyInjection
     private static void AddProvider(
         IServiceCollection s, AiOptions ai)
     {
-        if (string.IsNullOrWhiteSpace(ai.ApiKey) ||
-            string.IsNullOrWhiteSpace(ai.Endpoint))
+        if (string.IsNullOrWhiteSpace(ai.Endpoint) ||
+            (ai.Auth == "ApiKey" &&
+             string.IsNullOrWhiteSpace(ai.ApiKey)))
             throw new InvalidOperationException(
                 "Ai:Endpoint e Ai:ApiKey são obrigatórios " +
                 "(user-secrets ou variável Ai__ApiKey).");
@@ -84,18 +89,9 @@ public static class DependencyInjection
                 o.AttemptTimeout.Timeout * 2;
         });
 
-        s.AddSingleton(sp => new OpenAIClient(
-            new ApiKeyCredential(ai.ApiKey),
-            new OpenAIClientOptions
-            {
-                Endpoint = new Uri(ai.Endpoint),
-                // O retry fica no handler HTTP; o do SDK sairia
-                // multiplicando as tentativas.
-                RetryPolicy = new ClientRetryPolicy(0),
-                Transport = new HttpClientPipelineTransport(
-                    sp.GetRequiredService<IHttpClientFactory>()
-                        .CreateClient("ai"))
-            }));
+        s.AddSingleton(sp => OpenAiClientFactory.Create(ai,
+            sp.GetRequiredService<IHttpClientFactory>()
+                .CreateClient("ai")));
 
         s.AddEmbeddingGenerator(sp => sp
                 .GetRequiredService<OpenAIClient>()
@@ -117,15 +113,14 @@ public static class DependencyInjection
     /// binário (ou usa Documents:Path).</summary>
     private static string DocsPath(IConfiguration c)
     {
-        var configured = c["Documents:Path"];
-        if (!string.IsNullOrWhiteSpace(configured))
-            return configured;
+        var name = c["Documents:Path"] ?? "docs-exemplo";
+        if (Path.IsPathRooted(name)) return name;
         for (var d = new DirectoryInfo(AppContext.BaseDirectory);
              d is not null; d = d.Parent)
         {
-            var p = Path.Combine(d.FullName, "docs-exemplo");
+            var p = Path.Combine(d.FullName, name);
             if (Directory.Exists(p)) return p;
         }
-        return "docs-exemplo";
+        return name;
     }
 }

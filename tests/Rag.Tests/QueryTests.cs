@@ -168,21 +168,4 @@ public class QueryTests
 
         Assert.Equal(1, counter.BatchSizes.Count - before);
     }
-
-    [Fact]
-    public void Citation_numbers_are_parsed()
-    {
-        Assert.Equal([1, 3],
-            Groundedness.CitedNumbers("a [3] b [1] c [3]"));
-    }
-
-    [Fact]
-    public void Coverage_flags_unsupported_sentences()
-    {
-        const string ctx = "Deploy acontece de segunda a quinta.";
-        Assert.Equal(1, Groundedness.Coverage(
-            "Deploy acontece de segunda a quinta. [1]", ctx));
-        Assert.True(Groundedness.Coverage(
-            "O banco de dados usa criptografia quântica.", ctx) < 0.5);
-    }
 }

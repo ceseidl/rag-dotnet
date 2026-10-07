@@ -488,3 +488,9 @@ secrets.json
 **/appsettings.*.local.json
 **/appsettings.Secrets.json
 .secrets/
+
+## Seus documentos e perguntas (nunca versionar dados reais)
+docs-meus/*
+!docs-meus/README.md
+!docs-meus/.gitkeep
+eval/meu-*.json

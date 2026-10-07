@@ -137,7 +137,7 @@ public sealed class Rig
         IEmbeddingGenerator<string, Embedding<float>>? embedder = null)
     {
         var docs = new List<SourceDocument>();
-        await foreach (var d in new MarkdownFolderSource(DocsFolder())
+        await foreach (var d in new FolderDocumentSource(DocsFolder())
                            .ReadAllAsync())
             docs.Add(d);
         var rig = new Rig(docs, chat, embedder);

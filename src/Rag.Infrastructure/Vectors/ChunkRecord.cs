@@ -1,37 +1,25 @@
-using Microsoft.Extensions.VectorData;
-
 namespace Rag.Infrastructure.Vectors;
 
 /// <summary>Modelo de armazenamento. Fica na infraestrutura: o
-/// domínio não conhece atributos de vector store.</summary>
+/// domínio não conhece tipos de provedor. O mapeamento para o
+/// vector store está em VectorChunkStore.Definition.</summary>
 public sealed class ChunkRecord
 {
-    // Dimensão do text-embedding-3-small (padrão); constante
-    // porque o atributo exige um valor de compilação.
+    /// <summary>Dimensão padrão (text-embedding-3-small); a real
+    /// vem de Ai:EmbeddingDimensions.</summary>
     public const int Dimensions = 1536;
 
-    [VectorStoreKey]
     public string Id { get; set; } = "";
-
-    [VectorStoreData(IsIndexed = true)]
     public string DocumentId { get; set; } = "";
-
-    [VectorStoreData(IsIndexed = true)]
     public int Index { get; set; }
-
-    [VectorStoreData(IsIndexed = true)]
     public int Access { get; set; }
-
-    [VectorStoreData] public string Title { get; set; } = "";
-    [VectorStoreData] public string Section { get; set; } = "";
-    [VectorStoreData] public string Version { get; set; } = "";
-    [VectorStoreData] public string Source { get; set; } = "";
-    [VectorStoreData] public string Text { get; set; } = "";
-    [VectorStoreData] public string Hash { get; set; } = "";
-    [VectorStoreData]
+    public string Title { get; set; } = "";
+    public string Section { get; set; } = "";
+    public string Version { get; set; } = "";
+    public string Source { get; set; } = "";
+    public string Area { get; set; } = "";
+    public string Text { get; set; } = "";
+    public string Hash { get; set; } = "";
     public string DocumentHash { get; set; } = "";
-
-    [VectorStoreVector(Dimensions,
-        DistanceFunction = DistanceFunction.CosineSimilarity)]
     public ReadOnlyMemory<float> Embedding { get; set; }
 }

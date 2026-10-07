@@ -7,12 +7,13 @@ namespace Rag.Infrastructure.Offline;
 /// <summary>FAKE determinístico para testes e demo sem rede:
 /// bag-of-words com hashing de termos. Valida a MECÂNICA do
 /// pipeline; NÃO tem qualidade semântica real.</summary>
-public sealed class HashingEmbeddingGenerator
+public sealed class HashingEmbeddingGenerator(
+    int dimensions = ChunkRecord.Dimensions)
     : IEmbeddingGenerator<string, Embedding<float>>
 {
     public EmbeddingGeneratorMetadata Metadata { get; } =
         new("offline", defaultModelId: "hashing-bow-v1",
-            defaultModelDimensions: ChunkRecord.Dimensions);
+            defaultModelDimensions: dimensions);
 
     public Task<GeneratedEmbeddings<Embedding<float>>>
         GenerateAsync(
@@ -21,13 +22,15 @@ public sealed class HashingEmbeddingGenerator
         CancellationToken cancellationToken = default)
     {
         var result = new GeneratedEmbeddings<Embedding<float>>(
-            values.Select(v => new Embedding<float>(Embed(v))));
+            values.Select(v =>
+                new Embedding<float>(Embed(v, dimensions))));
         return Task.FromResult(result);
     }
 
-    public static float[] Embed(string text)
+    public static float[] Embed(
+        string text, int dims = ChunkRecord.Dimensions)
     {
-        var v = new float[ChunkRecord.Dimensions];
+        var v = new float[dims];
         foreach (var g in TextTokens.Of(text).GroupBy(t => t))
         {
             var h = Fnv(g.Key);

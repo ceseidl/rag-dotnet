@@ -26,7 +26,8 @@ public sealed partial class MarkdownChunker(RagOptions options)
                 result.Add(new Chunk(
                     $"{doc.Id}#{index}", doc.Id, index, doc.Title,
                     section, doc.Version, doc.Source, doc.Access,
-                    text, Hashing.Sha256(text), documentHash));
+                    text, Hashing.Sha256(text), documentHash,
+                    doc.Area));
             }
         }
         return result;

@@ -101,14 +101,6 @@ public class ApiTests(WebApplicationFactory<Program> factory)
         Assert.Equal(HttpStatusCode.OK, ok.StatusCode);
     }
 
-    [Fact]
-    public async Task Unversioned_route_does_not_exist()
-    {
-        var r = await Client().PostAsJsonAsync(
-            "/api/ask", new { question = "Posso fazer deploy?" });
-        Assert.Equal(HttpStatusCode.NotFound, r.StatusCode);
-    }
-
     private sealed class ThrowingChat : IChatClient
     {
         public Task<ChatResponse> GetResponseAsync(

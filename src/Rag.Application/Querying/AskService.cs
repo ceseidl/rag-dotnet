@@ -61,6 +61,7 @@ public sealed class AskService(
         ChatResponse reply, GuardedContext ctx, int candidates)
     {
         var answer = reply.Text.Trim();
+        log.LogDebug("Resposta bruta: {Answer}", answer);
         var cited = Groundedness.CitedNumbers(answer);
         var invalid = cited
             .Where(n => n < 1 || n > ctx.Chunks.Count).ToList();

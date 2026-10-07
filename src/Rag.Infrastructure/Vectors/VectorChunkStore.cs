@@ -6,12 +6,49 @@ namespace Rag.Infrastructure.Vectors;
 
 /// <summary>Adaptador de IChunkStore sobre Microsoft.Extensions.
 /// VectorData: o código serve a qualquer provedor.</summary>
-public sealed class VectorChunkStore(
-    VectorStore store) : IChunkStore
+public sealed class VectorChunkStore : IChunkStore
 {
-    private readonly VectorStoreCollection<string, ChunkRecord>
-        _col = store.GetCollection<string, ChunkRecord>("chunks");
+    private readonly
+        VectorStoreCollection<string, ChunkRecord> _col;
     private bool _ready;
+
+    public VectorChunkStore(VectorStore store,
+        int dimensions = ChunkRecord.Dimensions) =>
+        _col = store.GetCollection<string, ChunkRecord>(
+            "chunks", Definition(dimensions));
+
+    /// <summary>Mapeamento por código: a dimensão do vetor é
+    /// configuração (768 no nomic-embed-text, 1536 no
+    /// text-embedding-3-small).</summary>
+    public static VectorStoreCollectionDefinition Definition(
+        int dims) => new()
+    {
+        Properties =
+        [
+            new VectorStoreKeyProperty("Id", typeof(string)),
+            Data("DocumentId", typeof(string), true),
+            Data("Index", typeof(int), true),
+            Data("Access", typeof(int), true),
+            Data("Title", typeof(string)),
+            Data("Section", typeof(string)),
+            Data("Version", typeof(string)),
+            Data("Source", typeof(string)),
+            Data("Area", typeof(string)),
+            Data("Text", typeof(string)),
+            Data("Hash", typeof(string)),
+            Data("DocumentHash", typeof(string)),
+            new VectorStoreVectorProperty("Embedding",
+                typeof(ReadOnlyMemory<float>), dims)
+            {
+                DistanceFunction =
+                    DistanceFunction.CosineSimilarity
+            }
+        ]
+    };
+
+    private static VectorStoreDataProperty Data(
+        string name, Type type, bool indexed = false) =>
+        new(name, type) { IsIndexed = indexed };
 
     private async Task<VectorStoreCollection<string, ChunkRecord>>
         ColAsync(CancellationToken ct)
@@ -91,6 +128,7 @@ public sealed class VectorChunkStore(
         Index = i.Chunk.Index, Access = (int)i.Chunk.Access,
         Title = i.Chunk.Title, Section = i.Chunk.Section,
         Version = i.Chunk.Version, Source = i.Chunk.Source,
+        Area = i.Chunk.Area,
         Text = i.Chunk.Text, Hash = i.Chunk.Hash,
         DocumentHash = i.Chunk.DocumentHash, Embedding = i.Vector
     };
@@ -98,5 +136,5 @@ public sealed class VectorChunkStore(
     private static Chunk ToChunk(ChunkRecord r) => new(
         r.Id, r.DocumentId, r.Index, r.Title, r.Section,
         r.Version, r.Source, (AccessLevel)r.Access, r.Text,
-        r.Hash, r.DocumentHash);
+        r.Hash, r.DocumentHash, r.Area);
 }

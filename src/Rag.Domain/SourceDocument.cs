@@ -7,4 +7,5 @@ public sealed record SourceDocument(
     string Version,
     AccessLevel Access,
     string Source,
-    string Content);
+    string Content,
+    string Area = "");
