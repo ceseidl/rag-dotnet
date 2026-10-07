@@ -15,13 +15,15 @@ public class ChunkerAndIngestionTests
     [Fact]
     public void Chunks_respect_size_and_overlap()
     {
-        var opt = new RagOptions { ChunkSize = 400, ChunkOverlap = 80 };
+        var opt = new RagOptions
+            { ChunkSize = 400, ChunkOverlap = 80 };
         var doc = Rig.Doc("d", "# T\n\n" + LongText());
 
         var chunks = new MarkdownChunker(opt).Split(doc, "h");
 
         Assert.True(chunks.Count > 3);
-        Assert.All(chunks, c => Assert.True(c.Text.Length <= 400 + 80 + 2));
+        Assert.All(chunks,
+            c => Assert.True(c.Text.Length <= 400 + 80 + 2));
         for (var i = 1; i < chunks.Count; i++)
         {
             // as últimas palavras do trecho anterior reaparecem
