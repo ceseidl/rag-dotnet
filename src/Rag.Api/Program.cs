@@ -17,8 +17,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Perfil de provedor: Profile=Ollama carrega o arquivo
 // appsettings.Ollama.json (ou Foundry). Sem perfil: Offline.
 if (builder.Configuration["Profile"] is { Length: > 0 } profile)
+{
     builder.Configuration.AddJsonFile(
         $"appsettings.{profile}.json", optional: false);
+    // segredos e variáveis de ambiente continuam valendo mais
+    builder.Configuration.AddUserSecrets<Program>(optional: true);
+    builder.Configuration.AddEnvironmentVariables();
+    builder.Configuration.AddCommandLine(args);
+}
 
 builder.Services.AddRag(builder.Configuration);
 builder.Services.AddHostedService<IngestOnStartup>();
