@@ -13,7 +13,7 @@ public sealed class AiOptions
     /// <summary>Segredo: user-secrets ou Ai__ApiKey.</summary>
     public string? ApiKey { get; set; }
 
-    public string ChatModel { get; set; } = "gpt-4.1-mini";
+    public string ChatModel { get; set; } = "gpt-5-mini";
     public string EmbeddingModel { get; set; } =
         "text-embedding-3-small";
 

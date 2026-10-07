@@ -17,4 +17,9 @@ public sealed class RagOptions
     public int MaxContextChars { get; set; } = 6000;
     public int MaxQuestionLength { get; set; } = 500;
     public int MaxOutputTokens { get; set; } = 400;
+
+    // Modelos de raciocínio (gpt-5-mini) rejeitam temperature e
+    // gastam tokens de raciocínio dentro de MaxOutputTokens.
+    public bool SendTemperature { get; set; } = true;
+    public string ReasoningEffort { get; set; } = "";
 }

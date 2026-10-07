@@ -47,14 +47,23 @@ public sealed class AskService(
         ChatResponse reply;
         using (RagTelemetry.Start("generate"))
         {
-            reply = await chat.GetResponseAsync(messages,
-                new ChatOptions
-                {
-                    Temperature = 0,
-                    MaxOutputTokens = options.MaxOutputTokens
-                }, ct);
+            reply = await chat.GetResponseAsync(
+                messages, ChatSettings(), ct);
         }
         return Validate(reply, ctx, found.Candidates);
+    }
+
+    private ChatOptions ChatSettings()
+    {
+        var o = new ChatOptions
+        {
+            MaxOutputTokens = options.MaxOutputTokens
+        };
+        if (options.SendTemperature) o.Temperature = 0;
+        if (Enum.TryParse<ReasoningEffort>(
+                options.ReasoningEffort, true, out var effort))
+            o.Reasoning = new() { Effort = effort };
+        return o;
     }
 
     private AskResult Validate(

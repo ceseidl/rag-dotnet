@@ -31,7 +31,7 @@ dotnet build
 dotnet test
 ```
 
-Esperado: 33 aprovados. Os testes usam fakes determinísticos atrás das
+Esperado: 34 aprovados. Os testes usam fakes determinísticos atrás das
 mesmas interfaces; validam a **mecânica** (chunking, reindexação,
 limiar, filtro de acesso, proteção contra injeção, citações,
 retentativas), não a qualidade semântica de um modelo.
@@ -76,11 +76,13 @@ de embeddings e mantenha endpoint e chave fora do código:
 cd src/Rag.Api
 dotnet user-secrets set "Ai:ApiKey" "<sua-chave>"
 dotnet user-secrets set "Ai:Endpoint" \
-  "https://<recurso>.openai.azure.com/openai/v1/"
+  "https://<seu-recurso>.services.ai.azure.com/openai/v1/"
 ```
 
-Coloque os nomes dos seus deployments no `appsettings.Foundry.json`
-(sem segredos) e rode com `Profile=Foundry`. Sem chave, use o Microsoft
+O perfil já usa `gpt-5-mini` + `text-embedding-3-small` (1536 dim); o
+`gpt-5-mini` é modelo de raciocínio, então `temperature` não é enviada e
+valem `max_completion_tokens` / `reasoning_effort`. Coloque os nomes dos
+seus deployments no `appsettings.Foundry.json` (sem segredos) e rode com `Profile=Foundry`. Sem chave, use o Microsoft
 Entra ID: `Ai__Auth=EntraId` (`DefaultAzureCredential`; muda só a
 criação do cliente em `OpenAiClientFactory`). O passo a passo, com os
 links da documentação oficial, está no artigo. Consulte a página oficial

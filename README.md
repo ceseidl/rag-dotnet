@@ -31,7 +31,7 @@ dotnet build
 dotnet test
 ```
 
-Expected: 33 passed. The tests use deterministic fakes behind the same
+Expected: 34 passed. The tests use deterministic fakes behind the same
 interfaces; they validate the **mechanics** (chunking, re-indexing,
 thresholds, access filter, injection guard, citations, retries), not
 the semantic quality of a model.
@@ -76,10 +76,13 @@ embeddings model, and keep the endpoint and key out of the code:
 cd src/Rag.Api
 dotnet user-secrets set "Ai:ApiKey" "<your-key>"
 dotnet user-secrets set "Ai:Endpoint" \
-  "https://<resource>.openai.azure.com/openai/v1/"
+  "https://<your-resource>.services.ai.azure.com/openai/v1/"
 ```
 
-Put your deployment names in `appsettings.Foundry.json` (no secrets
+The profile already uses `gpt-5-mini` + `text-embedding-3-small`
+(1536 dims); `gpt-5-mini` is a reasoning model, so `temperature` is not
+sent and `max_completion_tokens` / `reasoning_effort` are used instead.
+Put your own deployment names in `appsettings.Foundry.json` (no secrets
 there) and run with `Profile=Foundry`. Without a key, use Microsoft
 Entra ID: `Ai__Auth=EntraId` (`DefaultAzureCredential`; only the
 client creation in `OpenAiClientFactory` changes). Step by step, with

@@ -2,7 +2,11 @@ using System.Net;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
+using Rag.Application;
 using Rag.Application.Abstractions;
+using Rag.Application.Querying;
+using Rag.Tests.Support;
 using Rag.Infrastructure;
 
 namespace Rag.Tests;
@@ -13,13 +17,19 @@ namespace Rag.Tests;
 public class ProviderResilienceTests
 {
     private sealed class StubHandler(
-        Func<int, HttpResponseMessage> reply) : HttpMessageHandler
+        Func<int, HttpResponseMessage> reply,
+        Action<HttpRequestMessage>? inspect = null)
+        : HttpMessageHandler
     {
         public int Calls;
 
         protected override Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request, CancellationToken ct) =>
-            Task.FromResult(reply(Interlocked.Increment(ref Calls)));
+            HttpRequestMessage request, CancellationToken ct)
+        {
+            inspect?.Invoke(request);
+            return Task.FromResult(
+                reply(Interlocked.Increment(ref Calls)));
+        }
     }
 
     private static HttpResponseMessage TooMany() =>
@@ -88,6 +98,42 @@ public class ProviderResilienceTests
 
         Assert.Equal(3, stub.Calls);          // 1 + 2 retentativas
         Assert.Equal(TimeSpan.Zero, ex.RetryAfter);
+    }
+
+    [Fact]
+    public async Task Reasoning_model_request_has_only_accepted_parameters()
+    {
+        string? body = null;
+        var stub = new StubHandler(_ => new(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                "{\"id\":\"x\",\"object\":\"chat.completion\"," +
+                "\"created\":1,\"model\":\"gpt-5-mini\",\"choices\":" +
+                "[{\"index\":0,\"finish_reason\":\"stop\",\"message\":" +
+                "{\"role\":\"assistant\",\"content\":\"Sim. [1]\"}}]," +
+                "\"usage\":{\"prompt_tokens\":9,\"completion_tokens\":3," +
+                "\"total_tokens\":12}}", System.Text.Encoding.UTF8,
+                "application/json")
+        }, r => body = r.Content!.ReadAsStringAsync().Result);
+        using var sp = Build(stub);
+        var rig = await Rig.WithSampleDocsAsync();
+        var opt = new RagOptions
+        {
+            MaxOutputTokens = 2000,
+            SendTemperature = false,
+            ReasoningEffort = "Low"
+        };
+        var ask = new AskService(rig.Retrieval,
+            sp.GetRequiredService<IChatClient>(), opt,
+            NullLogger<AskService>.Instance);
+
+        await ask.AskAsync(new("Posso fazer deploy na sexta-feira?",
+            Rag.Domain.AccessLevel.Team));
+
+        Assert.Contains("\"max_completion_tokens\":2000", body);
+        Assert.Contains("\"reasoning_effort\":\"low\"", body);
+        Assert.DoesNotContain("temperature", body);
+        Assert.DoesNotContain("\"max_tokens\"", body);
     }
 
     [Fact]
