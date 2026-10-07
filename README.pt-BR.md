@@ -67,7 +67,7 @@ docker stop ollama && docker rm ollama
 docker volume rm ollama        # apaga os modelos baixados
 ```
 
-## 3. Opção B: Azure AI Foundry (da documentação, NÃO executada pelo autor)
+## 3. Opção B: Azure AI Foundry (executada pelo autor em 07/10/2026)
 
 Crie um recurso e um projeto Foundry, publique um modelo de chat e um
 de embeddings e mantenha endpoint e chave fora do código:
@@ -84,8 +84,11 @@ O perfil já usa `gpt-5-mini` + `text-embedding-3-small` (1536 dim); o
 valem `max_completion_tokens` / `reasoning_effort`. Coloque os nomes dos
 seus deployments no `appsettings.Foundry.json` (sem segredos) e rode com `Profile=Foundry`. Sem chave, use o Microsoft
 Entra ID: `Ai__Auth=EntraId` (`DefaultAzureCredential`; muda só a
-criação do cliente em `OpenAiClientFactory`). O passo a passo, com os
-links da documentação oficial, está no artigo. Consulte a página oficial
+criação do cliente em `OpenAiClientFactory`). Medido com `gpt-5-mini` + `text-embedding-3-small` (as mesmas 16
+perguntas-ouro, `MinScore` 0,3): hit rate 100%, MRR 1,00, abstenção 3/3,
+13 de 13 perguntas cobertas respondidas, média de 3,0 s por pergunta. O
+Entra ID não foi executado (o autor não pôde atribuir papéis). O passo a
+passo, com os links da documentação oficial, está no artigo. Consulte a página oficial
 de preços: esta opção é paga por uso.
 
 ## 4. Use os seus dados

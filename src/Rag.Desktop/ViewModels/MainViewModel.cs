@@ -194,7 +194,10 @@ public sealed class MainViewModel : Observable
         Metrics.Add(new("ancoragem", $"{d.Grounding:P0}"));
         Metrics.Add(new("tempo total", $"{secs:0.0} s"));
         Status = r.Answered ? "Resposta com fontes."
-            : "O provedor não encontrou base nos documentos.";
+            : d.Used == 0
+                ? "Nenhum trecho passou do limiar: " +
+                  "o modelo nem foi chamado."
+                : "O provedor não encontrou base nos documentos.";
     }
 
     private void Begin()
