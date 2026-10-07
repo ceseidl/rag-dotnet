@@ -33,7 +33,7 @@ dotnet build
 dotnet test
 ```
 
-Esperado: 34 aprovados, 0 falhas. Os testes usam fakes determinísticos
+Esperado: 35 aprovados, 0 falhas. Os testes usam fakes determinísticos
 atrás das mesmas interfaces (`HashingEmbeddingGenerator`, bag-of-words
 com hashing; `ExtractiveChatClient`, que escolhe uma frase do
 contexto). Eles validam a **mecânica** do pipeline (chunking,

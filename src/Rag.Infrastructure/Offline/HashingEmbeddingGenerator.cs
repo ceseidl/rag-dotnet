@@ -11,8 +11,8 @@ public sealed class HashingEmbeddingGenerator
     : IEmbeddingGenerator<string, Embedding<float>>
 {
     public EmbeddingGeneratorMetadata Metadata { get; } =
-        new("hashing-bow-v1", defaultModelDimensions:
-            ChunkRecord.Dimensions);
+        new("offline", defaultModelId: "hashing-bow-v1",
+            defaultModelDimensions: ChunkRecord.Dimensions);
 
     public Task<GeneratedEmbeddings<Embedding<float>>>
         GenerateAsync(

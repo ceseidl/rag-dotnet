@@ -33,7 +33,7 @@ dotnet build
 dotnet test
 ```
 
-Expected: 34 passed, 0 failed. The tests use deterministic fakes
+Expected: 35 passed, 0 failed. The tests use deterministic fakes
 behind the same interfaces (`HashingEmbeddingGenerator`, a
 bag-of-words hashing; `ExtractiveChatClient`, which picks a sentence
 from the context). They validate the **mechanics** of the pipeline

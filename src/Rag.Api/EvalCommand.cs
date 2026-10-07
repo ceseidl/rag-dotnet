@@ -26,17 +26,21 @@ public static class EvalCommand
                 await File.ReadAllTextAsync(path), Json)!;
 
         var sp = app.Services;
-        await sp.GetRequiredService<IngestionService>().RunAsync();
-        var r = await sp.GetRequiredService<EvaluationRunner>()
-            .RunAsync(golden);
+        var ingest = sp.GetRequiredService<IngestionService>();
+        await ingest.RunAsync();
+        var runner = sp.GetRequiredService<EvaluationRunner>();
+        var r = await runner.RunAsync(golden);
 
-        Console.WriteLine($"perguntas        {r.Questions}");
-        Console.WriteLine($"hit rate         {r.HitRate:P0}");
-        Console.WriteLine($"MRR              {r.Mrr:0.00}");
-        Console.WriteLine($"recall@k         {r.RecallAtK:P0}");
-        Console.WriteLine($"abstenção certa  {r.AbstentionAccuracy:P0}");
-        Console.WriteLine($"ancoragem média  {r.MeanGrounding:P0}");
-        r.Failures.ToList().ForEach(f => Console.WriteLine("  - " + f));
+        void Show(string k, string v) =>
+            Console.WriteLine($"{k,-17}{v}");
+        Show("perguntas", $"{r.Questions}");
+        Show("hit rate", $"{r.HitRate:P0}");
+        Show("MRR", $"{r.Mrr:0.00}");
+        Show("recall@k", $"{r.RecallAtK:P0}");
+        Show("abstenção certa", $"{r.AbstentionAccuracy:P0}");
+        Show("ancoragem média", $"{r.MeanGrounding:P0}");
+        foreach (var f in r.Failures)
+            Console.WriteLine("  - " + f);
         return r.Failures.Count == 0 ? 0 : 1;
     }
 }

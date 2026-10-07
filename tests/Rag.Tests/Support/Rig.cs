@@ -69,13 +69,31 @@ public sealed class CountingEmbedder
     public void Dispose() { }
 }
 
+public sealed class NamedEmbedder(string model)
+    : IEmbeddingGenerator<string, Embedding<float>>
+{
+    private readonly HashingEmbeddingGenerator _inner = new();
+
+    public Task<GeneratedEmbeddings<Embedding<float>>> GenerateAsync(
+        IEnumerable<string> values,
+        EmbeddingGenerationOptions? options = null,
+        CancellationToken cancellationToken = default) =>
+        _inner.GenerateAsync(values, options, cancellationToken);
+
+    public object? GetService(Type t, object? k = null) =>
+        t == typeof(EmbeddingGeneratorMetadata)
+            ? new EmbeddingGeneratorMetadata("test", null, model)
+            : null;
+
+    public void Dispose() { }
+}
+
 /// <summary>Monta o pipeline inteiro sem DI, com fakes offline.</summary>
 public sealed class Rig
 {
     public RagOptions Options { get; }
     public ListSource Source { get; }
-    public IChunkStore Store { get; } =
-        new VectorChunkStore(new InMemoryVectorStore());
+    public IChunkStore Store { get; }
     public IEmbeddingGenerator<string, Embedding<float>> Embedder { get; }
     public IChatClient Chat { get; }
     public IngestionService Ingestion { get; }
@@ -85,8 +103,11 @@ public sealed class Rig
     public Rig(IEnumerable<SourceDocument>? docs = null,
         IChatClient? chat = null,
         IEmbeddingGenerator<string, Embedding<float>>? embedder = null,
-        RagOptions? options = null)
+        RagOptions? options = null,
+        IChunkStore? store = null)
     {
+        Store = store ??
+            new VectorChunkStore(new InMemoryVectorStore());
         Options = options ?? new RagOptions();
         Source = new ListSource((docs ?? []).ToList());
         Embedder = embedder ?? new HashingEmbeddingGenerator();

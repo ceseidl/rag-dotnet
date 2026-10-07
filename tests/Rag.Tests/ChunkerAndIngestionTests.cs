@@ -87,6 +87,19 @@ public class ChunkerAndIngestionTests
     }
 
     [Fact]
+    public async Task Changing_the_embedding_model_reindexes()
+    {
+        var docs = new[] { Rig.Doc("a", "# A\n\nTexto.") };
+        var first = new Rig(docs, embedder: new NamedEmbedder("m1"));
+        await first.Ingestion.RunAsync();
+
+        var second = new Rig(docs, embedder: new NamedEmbedder("m2"),
+            store: first.Store);
+
+        Assert.Equal(1, (await second.Ingestion.RunAsync()).Updated);
+    }
+
+    [Fact]
     public async Task Removes_documents_that_left_the_source()
     {
         var rig = new Rig([Rig.Doc("a", "# A\n\nUm."),
