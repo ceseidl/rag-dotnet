@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.VectorData;
 using OpenAI;
+using Polly;
 using Rag.Application;
 using Rag.Application.Abstractions;
 using Rag.Application.Evaluation;
@@ -72,7 +73,9 @@ public static class DependencyInjection
         s.AddHttpClient("ai").AddStandardResilienceHandler(o =>
         {
             o.Retry.MaxRetryAttempts = ai.MaxRetries;
-            o.Retry.ShouldRetryAfterHeader = true; // respeita 429
+            o.Retry.BackoffType = DelayBackoffType.Exponential;
+            o.Retry.UseJitter = true;
+            o.Retry.ShouldRetryAfterHeader = true; // padrão
             o.AttemptTimeout.Timeout =
                 TimeSpan.FromSeconds(ai.AttemptTimeoutSeconds);
             o.TotalRequestTimeout.Timeout =
